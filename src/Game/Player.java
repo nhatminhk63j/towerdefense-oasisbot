@@ -6,6 +6,6 @@ public class Player {
 
     public Player(){
         this.health = 200;
-        this.money = 300;
+        this.money = 5000;
     }
 }

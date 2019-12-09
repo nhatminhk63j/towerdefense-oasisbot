@@ -1,115 +1,110 @@
 package Entity.Tower;
 
 import Game.Screen;
+import Game.Value;
 
+import javax.script.ScriptEngine;
 import javax.swing.*;
+import javax.xml.validation.Validator;
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Shop {
-    public List<Tower> listItem = new ArrayList<>();
-
-    Image[] item = new Image[3];
-    Image coinItem;
-
-    public boolean holdsItem = false;
+    public List<Tower> items = new ArrayList<>();
+    public Image[] itemImages = new Image[3];
+    public boolean holdItem = false;
+    int x, y;
+    int xMouse, yMouse;
+    int holdX, holdY;
     boolean mouseDown = false;
-    public int xPos, yPos;
-    public int holdXPos, holdYPos;
-
-    public int[] price = {NormalTower.getPrice(), MachineGunTower.getPrice(), SniperTower.getPrice()};
-    public int[] range = {300, 150, 200};
+    public Image pause = new ImageIcon("res/pause_button.jpg").getImage();
 
     public Shop(){
-        define();
+        init();
     }
 
-    private void define() {
-        item[0] = new ImageIcon("res/NormalTower.png").getImage();
-        item[1] = new ImageIcon("res/MachineGunTower.png").getImage();
-        item[2] = new ImageIcon("res/SniperTower.png").getImage();
+    private void init() {
+        itemImages[0] = new ImageIcon("res/NormalTower.png").getImage();
+        itemImages[1] = new ImageIcon("res/MachineGunTower.png").getImage();
+        itemImages[2] = new ImageIcon("res/SniperTower.png").getImage();
     }
 
-    public void creatListItem(){
-        listItem.add(new NormalTower(60, 640));
-        listItem.add(new MachineGunTower(144, 640));
-        listItem.add(new SniperTower( 228, 640));
-    }
-
-    public void click(java.awt.event.MouseEvent e){
-        xPos = (e.getX() - 60) / 64;
-        yPos = (e.getY()) / 64;
+    public void click(MouseEvent e){
+        xMouse = e.getX() - (Screen.frame.getWidth() - Screen.myWidth - 8);
+        yMouse = e.getY() - (Screen.frame.getHeight() - Screen.myHeight - 8);
+        x = (int)((xMouse - 60) / Value.SIZE_TILE);
+        y = (int)(yMouse / Value.SIZE_TILE);
 
         mouseDown = true;
-        if(holdsItem){
-            if(xPos < 20 && yPos < 9){
-                if(Screen.map.isCanPutTower[yPos][xPos]){
-                    if(Screen.player.money >= Screen.listTower.getPrice()){
-                        Screen.listTower.add(e.getX() - 34, e.getY() - 64);
-                        Screen.player.money -= Screen.listTower.getPrice();
-                    }
 
+        if(holdItem){
+            if(x < 20 && y < 9){
+                if(Screen.map.isCanPutTower[y][x]){
+                    if(Screen.player.money >= Screen.listTower.getPrice()){
+                        Screen.player.money -= Screen.listTower.getPrice();
+                        Screen.listTower.add(60 + x * Value.SIZE_TILE, y * Value.SIZE_TILE, Value.SIZE_TILE, Value.SIZE_TILE);
+                        Screen.listTower.setFlag(0);
+                    }
                 }
-                holdsItem = false;
+                holdItem = false;
             }
         }
         mouseUpdate(e);
     }
 
     private void mouseUpdate(MouseEvent e) {
+        if(mouseDown && !holdItem){
 
-        if(mouseDown && !holdsItem){
+            if(xMouse >= 60 && xMouse <= 124 && yMouse >= 640 && yMouse <= 704){
+                holdItem = true;
+                mouseDown = false;
+                Screen.listTower.flag = 1;
+            }
+            if(xMouse >= 144 && xMouse <= 208 && yMouse >= 640 && yMouse <= 704){
+                holdItem = true;
+                mouseDown = false;
+                Screen.listTower.flag = 2;
+            }
+            if(xMouse >= 228 && xMouse <= 292 && yMouse >= 640 && yMouse <= 704){
+                holdItem = true;
+                mouseDown = false;
+                Screen.listTower.flag = 3;
+            }
 
-            if(e.getX() >= 72 && e.getX() <= 124 && e.getY() >= 672 && e.getY() <= 730){
-                holdsItem = true;
-                Screen.listTower.chosen = 1;
+        }
+        if(xMouse >= 500 && xMouse <= 564 && yMouse >= 640 && yMouse <= 704){
+            Screen.isPauseGame = true;
+            System.out.println("Clicked");
+        }
+        if(Screen.isPauseGame){
+            if(xMouse >= 500 && xMouse <= 564 && yMouse >= 640 && yMouse <= 704){
+                Screen.isPauseGame = false;
             }
-            if(e.getX() >= 155 && e.getX() <= 215 && e.getY() >= 672 && e.getY() <= 730){
-                holdsItem = true;
-                Screen.listTower.chosen = 2;
-            }
-            if(e.getX() >= 235 && e.getX() <= 300 && e.getY() >= 672 && e.getY() <= 730){
-                holdsItem = true;
-                Screen.listTower.chosen = 3;
-            }
-
-//            Screen.listTower.chosen = -1;
         }
     }
 
     public void mouseMoved(MouseEvent e){
-        holdXPos = e.getX();
-        holdYPos = e.getY();
+        holdX = e.getX() - (Screen.frame.getWidth() - Screen.myWidth - 8);
+        holdY = e.getY() - (Screen.frame.getHeight() - Screen.myHeight - 8);
     }
 
     public void draw(Graphics2D g2d){
-        if(holdsItem){
-            if(Screen.listTower.chosen == 1){
-                g2d.drawImage(item[0], holdXPos - 34, holdYPos - 64, null);
-                g2d.setColor(Color.RED);
-                g2d.drawOval(holdXPos - range[0]/2, holdYPos - 30 - range[0]/2, range[0], range[0]);
-            } else if(Screen.listTower.chosen == 2){
-                g2d.drawImage(item[1], holdXPos - 34, holdYPos - 64, null);
-                g2d.setColor(Color.RED);
-                g2d.drawOval(holdXPos - range[1]/2, holdYPos - 30 - range[1]/2, range[1], range[1]);
-            } else{
-                g2d.drawImage(item[2], holdXPos - 34, holdYPos - 64, null);
-                g2d.setColor(Color.RED);
-                g2d.drawOval(holdXPos - range[2]/2, holdYPos - 30 - range[2]/2, range[2], range[2]);
-            }
+        // Vẽ danh sách các Tower để lựa chọn.
+        g2d.drawImage(itemImages[0], 60, 640, Value.SIZE_TILE, Value.SIZE_TILE, null);
+        g2d.drawImage(itemImages[1], 144, 640, Value.SIZE_TILE, Value.SIZE_TILE, null);
+        g2d.drawImage(itemImages[2], 228, 640, Value.SIZE_TILE, Value.SIZE_TILE, null);
+
+        // Vẽ item đang được chọn di chuyển theo chuột.
+        if(holdItem){
+            if(Screen.listTower.flag == 1) g2d.drawImage(itemImages[0], holdX - Value.SIZE_TILE/2, holdY - Value.SIZE_TILE/2, Value.SIZE_TILE, Value.SIZE_TILE, null);
+            else if(Screen.listTower.flag == 2) g2d.drawImage(itemImages[1], holdX - Value.SIZE_TILE/2, holdY - Value.SIZE_TILE/2, Value.SIZE_TILE, Value.SIZE_TILE, null);
+            else if(Screen.listTower.flag == 3) g2d.drawImage(itemImages[2], holdX - Value.SIZE_TILE/2, holdY - Value.SIZE_TILE/2, Value.SIZE_TILE, Value.SIZE_TILE, null);
         }
-        int i = 0;
-        for(Tower tower : listItem){
-            tower.draw(g2d);
-            g2d.setColor(Color.DARK_GRAY);
-            g2d.setFont(new Font("Arial", Font.BOLD, 8));
-            g2d.drawString(tower.getType(), tower.getxPos() + 8, tower.getyPos());
-            g2d.setFont(new Font("Arial", Font.BOLD, 16));
-            g2d.drawString("" + price[i++] ,tower.getxPos() + 16, tower.getyPos() + 75);
-            if(i == 3) i = 0;
-        }
+
+        g2d.drawImage(pause, 500, 640, 64, 64, null);
 
         g2d.setColor(Color.DARK_GRAY);
         g2d.setFont(new Font("Arial", Font.BOLD, 16));
@@ -117,10 +112,13 @@ public class Shop {
         g2d.setColor(Color.RED);
         g2d.fillRect(450, 640 - 15, 200, 20);
         g2d.setColor(Color.GREEN);
-        g2d.fillRect(450, 640 - 15, Screen.player.health - 50, 20);
+        g2d.fillRect(450, 640 - 15, Screen.player.health, 20);
 
         g2d.setColor(Color.DARK_GRAY);
         g2d.setFont(new Font("Arial", Font.BOLD, 16));
         g2d.drawString("Coin: " + Screen.player.money, 350, 700);
+
     }
+
+
 }

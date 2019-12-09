@@ -14,7 +14,7 @@ public class SpawnPoint {
     public Point findSpawnPoint(){
         for(int y=0; y <9; y++){
             for(int x=0; x < 20; x++){
-                if(Screen.map.map[y][x] == 14) return new Point((Screen.myWidth - 1280)/2 + 64 * x, 64 * y);
+                if(Screen.map.map[y][x] == 14) return new Point((Screen.frame.getWidth() - 1280)/2 + 64 * x, 64 * y);
             }
         }
         return null;

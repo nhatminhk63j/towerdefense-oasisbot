@@ -1,9 +1,15 @@
 package Entity.Enemy;
 
+import java.awt.*;
+
 public class BossEnemy extends Enemy {
-    public BossEnemy(){
-        super(5000, 300, 1, 3);
-        setType("BossEnemy");
-        route = RIGHT;
+
+    public BossEnemy(int x, int y, int width, int height) {
+        super(x, y, width, height);
+    }
+
+    @Override
+    public void draw(Graphics2D g2d) {
+
     }
 }

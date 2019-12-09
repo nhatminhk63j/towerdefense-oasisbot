@@ -1,22 +1,26 @@
 package Entity.Enemy;
 
+import Entity.Bullet.Bullet;
 import Entity.Entity;
 import Game.Screen;
-import Map.SpawnPoint;
+import Game.Value;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
+import java.util.Scanner;
 
 public abstract class Enemy extends Entity {
-    public int health;
-    int damage;
-    int speed;
-    int armor;
-    int route;
-    int xC, yC, enemyMove;
+    private int hp;
+    private double speed;
+    private int armor;
+    private int rewardMoney;
+    private int damage;
+    private int flag;
+    private double angle;
+    private int xMove, yMove;
+    private int route;
+    public int enemyMove;
     public boolean inGame = false;
-    public double angle;
 
     public boolean hasUp = false;
     public boolean hasDown = false;
@@ -28,77 +32,83 @@ public abstract class Enemy extends Entity {
     public static final int DOWN = 3;
     public static final int UP = 4;
 
-    public Enemy(int health, int damage, int speed, int armor){
-        this.health = health;
-        this.damage = damage;
-        this.speed = speed;
-        this.armor = armor;
-        this.center = this.getCenter();
 
+    public Enemy(int x, int y, int width, int height) {
+        super(x, y, width, height);
+        this.flag = 0;
+        inGame = true;
         this.setxPos((int) Screen.spawnPoint.spawnPoint.getX());
         this.setyPos((int) Screen.spawnPoint.spawnPoint.getY());
-        xC = 0;
-        yC = 1;
-    }
-    public Shape collider() {
-        return new Rectangle2D.Double(getxPos() + 30, getyPos() + 30, 2, 2);
-    }
 
-    public Point getCenter(){
-        return new Point(getxPos() + 32, getyPos() + 32);
+        route = RIGHT;
+
+        xMove = 0;
+        yMove = 1;
     }
 
-    public int moveFrame = 0, moveSpeed = 4;
+    public int getDamage() {
+        return damage;
+    }
 
+    public void setDamage(int damage) {
+        this.damage = damage;
+    }
+
+    public double getAngle() {
+        return angle;
+    }
+
+    public void setAngle(double angle) {
+        this.angle = angle;
+    }
+
+    public int timeMove = 1, timeDelay = 4;
     public void move(){
 
-        if(moveFrame >= moveSpeed){
+        if(timeMove >= timeDelay){
             switch (route){
                 case RIGHT:
-                    setxPos(getxPos() + speed);
+                    setxPos((int) (getxPos() + speed));
                     angle = 0;
                     break;
                 case LEFT:
-                    setxPos(getxPos() - speed);
+                    setxPos((int) (getxPos() - speed));
                     angle = 180;
                     break;
                 case DOWN:
-                    setyPos(getyPos() + speed);
+                    setyPos((int) (getyPos() + speed));
                     angle = 90;
                     break;
                 case UP:
-                    setyPos(getyPos() - speed);
+                    setyPos((int) (getyPos() - speed));
                     angle = 270;
                     break;
             }
             enemyMove++;
-            moveFrame = 0;
-        } else moveFrame++;
+            timeMove = 0;
+        } timeMove++;
 
-    }
-
-    public void findRoute(){
         if(enemyMove >= 64){
             if(route == RIGHT){
-                xC++;
+                xMove++;
                 hasRight = true;
             } else if(route == LEFT){
-                xC--;
+                xMove--;
                 hasLeft = true;
             } else if(route == DOWN){
-                yC++;
+                yMove++;
                 hasDown = true;
             } else if(route == UP){
-                yC--;
+                yMove--;
                 hasUp = true;
             }
 
             if(!hasLeft){
                 try{
-                    if(Screen.map.map[yC][xC + 1] == 1){
+                    if(Screen.map.map[yMove][xMove + 1] == 1){
                         route = RIGHT;
-                    } else if(Screen.map.map[yC][xC + 1] == 15){
-                        health = 0;
+                    } else if(Screen.map.map[yMove][xMove + 1] == 15){
+                        hp = 0;
                         Screen.player.health -= damage;
                     }
                 } catch (Exception e){};
@@ -106,10 +116,10 @@ public abstract class Enemy extends Entity {
 
             if(!hasRight){
                 try{
-                    if(Screen.map.map[yC][xC - 1] == 1){
+                    if(Screen.map.map[yMove][xMove - 1] == 1){
                         route = LEFT;
-                    } else if(Screen.map.map[yC][xC - 1] == 15){
-                        health = 0;
+                    } else if(Screen.map.map[yMove][xMove - 1] == 15){
+                        hp = 0;
                         Screen.player.health -= damage;
                     }
                 } catch (Exception e){};
@@ -117,10 +127,10 @@ public abstract class Enemy extends Entity {
 
             if(!hasUp){
                 try{
-                    if(Screen.map.map[yC + 1][xC] == 1){
+                    if(Screen.map.map[yMove + 1][xMove] == 1){
                         route = DOWN;
-                    } else if(Screen.map.map[yC + 1][xC] == 15){
-                        health = 0;
+                    } else if(Screen.map.map[yMove + 1][xMove] == 15){
+                        hp = 0;
                         Screen.player.health -= damage;
                     }
                 } catch (Exception e){};
@@ -128,10 +138,10 @@ public abstract class Enemy extends Entity {
 
             if(!hasDown){
                 try{
-                    if(Screen.map.map[yC - 1][xC] == 1){
+                    if(Screen.map.map[yMove - 1][xMove] == 1){
                         route = UP;
-                    } else if(Screen.map.map[yC - 1][xC] == 15){
-                        health = 0;
+                    } else if(Screen.map.map[yMove - 1][xMove] == 15){
+                        hp = 0;
                         Screen.player.health -= damage;
                     }
                 } catch (Exception e){};
@@ -144,17 +154,65 @@ public abstract class Enemy extends Entity {
 
             enemyMove = 0;
         }
-
+        setCenter();
     }
 
-    public void draw(Graphics2D graphics2D){
-        Image image = new ImageIcon("res/" + this.getType() + ".png").getImage();
-        graphics2D.rotate(angle, getxPos() + 32, getyPos() + 32);
-        graphics2D.drawImage(image, getxPos(), getyPos(), null);
-        graphics2D.rotate(-angle, getxPos() + 32, getyPos() + 32);
-        // Draw Health of enemy
-        findRoute();
-        move();
+    public boolean beAttacked(Bullet bullet){
+        if(getShapeCollider().intersects((Rectangle2D) bullet.getShapeCollider())){
+            hp -= bullet.getDamage();
+            return true;
+        }
+        return false;
     }
+
+
+    public Point getCenter(){
+        return new Point(getxPos() + Value.SIZE_TILE/2, getyPos() + Value.SIZE_TILE/2);
+    }
+
+    public Shape getShapeCollider(){
+        return new Rectangle2D.Double(getxPos(), getyPos(), getWidth(), getHeight());
+    }
+
+    public int getHp() {
+        return hp;
+    }
+
+    public void setHp(int hp) {
+        this.hp = hp;
+    }
+
+    public double getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(double speedMove) {
+        this.speed = speedMove;
+    }
+
+    public int getArmor() {
+        return armor;
+    }
+
+    public void setArmor(int armor) {
+        this.armor = armor;
+    }
+
+    public int getRewardMoney() {
+        return rewardMoney;
+    }
+
+    public void setRewardMoney(int rewardMoney) {
+        this.rewardMoney = rewardMoney;
+    }
+
+    public int getFlag() {
+        return flag;
+    }
+
+    public void setFlag(int flag) {
+        this.flag = flag;
+    }
+
 
 }

@@ -16,8 +16,10 @@ public class ListEnemy {
     }
 
     public void delete(){
-        for(Enemy enemy : enemyList){
-            if(enemy.health <= 0) enemy.inGame = false;
+        for(int i = 0; i < enemyList.size(); i++){
+            if(enemyList.get(i).getHp() <= 0){
+                enemyList.remove(i);
+            }
         }
     }
 
@@ -30,20 +32,19 @@ public class ListEnemy {
     }
 
     public Enemy createEnemy(){
-        return new NormalEnemy();
+        return new NormalEnemy(0, 0, 64, 64);
     }
 
     public void draw(Graphics2D graphics2D){
         for(Enemy enemy : enemyList){
-            if(enemy.inGame){
-                enemy.draw(graphics2D);
-            }
+            enemy.draw(graphics2D);
         }
     }
 
     public void setAmount(int amount) {
         this.amount = amount;
     }
+
 
 
 }

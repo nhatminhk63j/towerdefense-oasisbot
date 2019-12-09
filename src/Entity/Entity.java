@@ -1,16 +1,35 @@
 package Entity;
 
 import java.awt.*;
+import java.util.Map.Entry;
 
 public abstract class Entity {
     protected Point center;
     int xPos, yPos;
-    int size;
-    String type;
+    int width, height;
 
+    public Entity(int x, int y, int width, int height){
+        this.xPos = x;
+        this.yPos = y;
+        this.width = width;
+        this.height = height;
+        this.center = new Point(this.xPos + this.width / 2, this.yPos + this.height / 2);
+    }
+
+    public abstract void draw(Graphics2D g2d);
+    public abstract void move();
     public abstract Point getCenter();
+    public abstract Shape getShapeCollider();
 
-    public int getxPos() { return xPos; }
+    public void setCenter() {
+        this.center.x = this.xPos + this.width / 2;
+        this.center.y = this.yPos + this.height / 2;
+
+    }
+
+    public int getxPos() {
+        return xPos;
+    }
 
     public void setxPos(int xPos) {
         this.xPos = xPos;
@@ -24,11 +43,19 @@ public abstract class Entity {
         this.yPos = yPos;
     }
 
-    public String getType() {
-        return type;
+    public int getWidth() {
+        return width;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
     }
 }

@@ -1,171 +1,173 @@
 package Entity.Tower;
 
+import Entity.Bullet.Bullet;
+import Entity.Bullet.MachineGunTowerBullet;
+import Entity.Bullet.NormalTowerBullet;
+import Entity.Bullet.SniperTowerBullet;
 import Entity.Enemy.Enemy;
 import Entity.Entity;
+import Game.Value;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
-import java.awt.geom.Ellipse2D.Float;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Tower extends Entity {
-    private static int price;
-    private static int speed;
-    private static int damage;
-    private static int range;
-    public Enemy target;
-
+public abstract class Tower extends Entity {
+    private int price;
+    private int range;
+    private int attackSpeed;
     private double angle;
     private int flag;
 
     private double xDistance;
     private double yDistance;
-    public int xTargetEnemy;
-    public int yTargetEnemy;
-    public int timeFrameBullet = 200, timeBorn = 200;
 
-    public List<Bullet> bulletList = new ArrayList<>();
+    private String type;
 
-    boolean isCollision = false;
+    private Image baseTower = new ImageIcon("res/BaseTower.png").getImage();
+    private List<Bullet> bullets = new ArrayList<>();
 
-    public Tower(int price, int speed, int damage, int range){
-        this.price = price;
-        this.speed = speed;
-        this.damage = damage;
-        this.range = range;
-        this.center = this.getCenter();
+    private long timeAttack;
+
+    public Tower(int x, int y, int width, int height){
+        super(x, y, width, height);
+        this.flag = 0;
     }
 
-    public void attackEnemy(ArrayList<Enemy> enemyList){
-        target = checkEnemyInRange(enemyList);
-        if(this.getType() == "NormalTower"){
-            if(target != null){
-                if(timeFrameBullet >= timeBorn){
-                    bulletList.add(new Bullet((int)getxPos(), (int)getyPos(), 15, target, "NormalTowerBullet"));
-                    timeFrameBullet = 0;
-                } else {
-                    timeFrameBullet += 1;
-                }
-            }
-            if(!bulletList.isEmpty() && target != null){
-                for(Bullet bullet : bulletList){
-                    if(!this.collider().contains(((Rectangle2D) bullet.collider()))){
-                        bullet.inGame = false;
-                    }
-                    if(bullet.collider().contains((Rectangle2D) target.collider()) && bullet.inGame){
-                        bullet.inGame = false;
-                        target.health -= 50;
-                        if(target.health <= 0) timeFrameBullet = timeBorn;
-                    }
-                }
-            }
-        } else if(this.getType() == "MachineGunTower"){
-            if(target != null){
-                if(timeFrameBullet >= timeBorn){
-                    bulletList.add(new Bullet((int)getxPos(), (int)getyPos(), 20, target, "MachineGunTowerBullet"));
-                    timeFrameBullet = 0;
-                } else {
-                    timeFrameBullet += 1;
-                }
-            }
-            if(!bulletList.isEmpty() && target != null){
-                for(Bullet bullet : bulletList){
-                    if(!this.collider().intersects(((Rectangle2D) bullet.collider()))){
-                        bullet.inGame = false;
-                    }
-                    if(bullet.collider().contains(target.getCenter()) && bullet.inGame){
-                        bullet.inGame = false;
-                        target.health -= 10;
-                        if(target.health <= 0) timeFrameBullet = timeBorn;
-                    }
-                }
+    public boolean checkCollision(ArrayList<Enemy> listEnemy){
+        if(listEnemy.isEmpty()) return false;
+        for(Enemy enemy : listEnemy){
+            if(getShapeCollider().intersects((Rectangle2D) enemy.getShapeCollider())){
+                xDistance = enemy.getCenter().x - this.getCenter().x;
+                yDistance = enemy.getCenter().y - this.getCenter().y;
+                this.angle = Math.atan(Math.abs(yDistance / xDistance));
+                return true;
             }
         }
-        else if(this.getType() == "SniperTower"){
-            if(target != null){
-                xTargetEnemy = target.getCenter().x;
-                yTargetEnemy = target.getCenter().y;
-                if(timeFrameBullet >= timeBorn){
-                    target.health -= this.damage;
-                    if(target.health <= 0) timeFrameBullet = timeBorn;
-                }
+        return false;
+    }
+
+    public void attackEnemy(ArrayList<Enemy> enemies){
+        if(checkCollision(enemies)){
+            long TIME = System.currentTimeMillis();
+            if(TIME - timeAttack < getAttackSpeed()) return;
+            timeAttack = TIME;
+            Bullet bullet = null;
+            if(getType() == "NormalTower"){
+                bullet = new NormalTowerBullet(this, getCenter().x, getCenter().y, Value.SIZE_TILE, Value.SIZE_TILE, getAngle());
+            } else if(getType() == "MachineGunTower"){
+                bullet = new MachineGunTowerBullet(this, getCenter().x, getCenter().y, Value.SIZE_TILE, Value.SIZE_TILE, getAngle());
+            } else if(getType() == "SniperTower"){
+                bullet = new SniperTowerBullet(this, getCenter().x, getCenter().y, Value.SIZE_TILE, Value.SIZE_TILE, getAngle());
+            }
+
+            if(getxDistance() <= 0 && getyDistance() <= 0) setFlag(1);
+            else if(getxDistance() <= 0 && getyDistance() >= 0) setFlag(2);
+            else if(getxDistance() >= 0 && getyDistance() <= 0) setFlag(3);
+            else if(getxDistance() >=0 && getyDistance() >= 0) setFlag(4);
+
+            bullet.setFlag(getFlag());
+            bullets.add(bullet);
+            // may be add Sound Effect in here...
+        }
+        for(int i = 0; i < bullets.size(); i++){
+            if(!getShapeCollider().contains((Rectangle2D) bullets.get(i).getShapeCollider())){
+                bullets.remove(i);
+            }
+            for(Enemy enemy : enemies){
+                if(enemy.beAttacked(bullets.get(i))) bullets.remove(i);
             }
         }
     }
 
-    public Enemy checkEnemyInRange(ArrayList<Enemy> enemyList){
-        int count = 0;
-        for(Enemy enemy : enemyList){
-            if(enemy.inGame){
-                if(collider().intersects((Rectangle2D) enemy.collider())){
-                    xDistance = (double) enemy.getCenter().getX() - this.getCenter().getX();
-                    yDistance = (double) enemy.getCenter().getY() - this.getCenter().getY();
-                    this.angle = Math.atan(Math.abs(yDistance / xDistance));
-                    return enemy;
-                }
-            }
-        }
-        return null;
-    }
-
-    public Shape collider() {
-        return new Ellipse2D.Double(getxPos() - getRange() / 2 + 64 / 2, getyPos() - getRange() / 2 + 64 / 2, getRange(), getRange());
-    }
-
-
-    public void draw(Graphics2D graphics2D){
-
-        Image image = new ImageIcon("res/" + this.getType() + ".png").getImage();
-        graphics2D.drawImage(image, getxPos(), getyPos(), null);
-        if(!bulletList.isEmpty()){
-            for(Bullet bullet : bulletList){
-                bullet.move();
-                bullet.draw(graphics2D);
-            }
-        }
-        if(this.getType() == "SniperTower" && target != null){
-            graphics2D.drawLine(this.getCenter().x, this.getCenter().y, xTargetEnemy, yTargetEnemy);
+    public void draw(Graphics2D g2d) {
+        g2d.setColor(Color.RED);
+        g2d.drawOval(getxPos() - getRange()/2 + 32, getyPos() - getRange()/2 + 32, getRange(), getRange());
+        g2d.drawImage(baseTower, getxPos(), getyPos(), 64, 64, null);
+        for(Bullet bullet : bullets){
+            bullet.move();
+            bullet.draw(g2d);
         }
 
     }
 
-    public static int getPrice() {
+    public void move() {
+        // Nothing write here...
+    }
+
+    public Point getCenter() {
+        return new Point(getxPos() + Value.SIZE_TILE/2, getyPos() + Value.SIZE_TILE/2);
+    }
+
+    public Shape getShapeCollider() {
+        return new Ellipse2D.Double(getxPos() - getRange() / 2 + getWidth() / 2, getyPos() - getRange() / 2 + getHeight() / 2, getRange(), getRange());
+    }
+
+    public int getPrice() {
         return price;
     }
 
-    public static void setPrice(int price) {
-        Tower.price = price;
+    public void setPrice(int price) {
+        this.price = price;
     }
 
-    public static int getSpeed() {
-        return speed;
-    }
-
-    public static void setSpeed(int speed) {
-        Tower.speed = speed;
-    }
-
-    public static int getDamage() {
-        return damage;
-    }
-
-    public static void setDamage(int damage) {
-        Tower.damage = damage;
-    }
-
-    public static int getRange() {
+    public int getRange() {
         return range;
     }
 
-    public static void setRange(int range) {
-        Tower.range = range;
+    public void setRange(int range) {
+        this.range = range;
     }
 
-    @Override
-    public Point getCenter() {
-        return new Point(getxPos() + 32, getyPos() + 32);
+    public int getAttackSpeed() {
+        return attackSpeed;
+    }
+
+    public void setAttackSpeed(int attackSpeed) {
+        this.attackSpeed = attackSpeed;
+    }
+
+    public double getAngle() {
+        return angle;
+    }
+
+    public void setAngle(double angle) {
+        this.angle = angle;
+    }
+
+    public int getFlag() {
+        return flag;
+    }
+
+    public void setFlag(int flag) {
+        this.flag = flag;
+    }
+
+    public double getxDistance() {
+        return xDistance;
+    }
+
+    public void setxDistance(double xDistance) {
+        this.xDistance = xDistance;
+    }
+
+    public double getyDistance() {
+        return yDistance;
+    }
+
+    public void setyDistance(double yDistance) {
+        this.yDistance = yDistance;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

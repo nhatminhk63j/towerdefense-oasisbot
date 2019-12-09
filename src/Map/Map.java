@@ -1,6 +1,7 @@
 package Map;
 
 import Game.Screen;
+import Game.Value;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,7 +12,6 @@ import java.util.Scanner;
 public class Map {
     public int[][] map;
     public static boolean[][] isCanPutTower = new boolean[9][20];
-    public int tileSize = 64;
 
     public Map(String str){
         map = loadMap(str);
@@ -49,7 +49,7 @@ public class Map {
         for(int y = 0; y < 9; y++){
             for(int x = 0; x < 20; x++){
                 Image image = new ImageIcon("res/" + map[y][x] + ".png").getImage();
-                g.drawImage(image, (Screen.myWidth - 1280)/2 + 64 * x, 64 * y, tileSize, tileSize, null);
+                g.drawImage(image, (Screen.frame.getWidth() - 1280)/2 + 64 * x, 64 * y, Value.SIZE_TILE, Value.SIZE_TILE, null);
             }
         }
     }

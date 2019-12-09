@@ -17,6 +17,9 @@ public class MouseHandler implements MouseMotionListener, MouseListener {
     @Override
     public void mousePressed(MouseEvent e) {
         Screen.shop.click(e);
+//        int a = e.getX() - (Screen.frame.getWidth() - Screen.myWidth - 8);
+//        int b = e.getY() - (Screen.frame.getHeight() - Screen.myHeight - 8);
+
     }
 
     @Override

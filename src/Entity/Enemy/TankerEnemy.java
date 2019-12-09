@@ -1,9 +1,15 @@
 package Entity.Enemy;
 
+import java.awt.*;
+
 public class TankerEnemy extends Enemy {
-    public TankerEnemy(){
-        super(5000, 200, 1, 2);
-        setType("TankerEnemy");
-        route = RIGHT;
+
+    public TankerEnemy(int x, int y, int width, int height) {
+        super(x, y, width, height);
+    }
+
+    @Override
+    public void draw(Graphics2D g2d) {
+
     }
 }

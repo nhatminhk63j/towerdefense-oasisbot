@@ -14,11 +14,11 @@ public class Frame extends JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         init();
+        setSize(size);
     }
 
 
     public void init(){
-        setLayout(new GridLayout(1,1,0,0));
         Screen screen = new Screen(this);
         add(screen);
         setVisible(true);
