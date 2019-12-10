@@ -3,6 +3,7 @@ package Handler;
 import Game.Frame;
 import Game.Screen;
 
+import javax.script.ScriptEngine;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -17,6 +18,8 @@ public class MouseHandler implements MouseMotionListener, MouseListener {
     @Override
     public void mousePressed(MouseEvent e) {
         Screen.shop.click(e);
+        Screen.remove.select(e);
+        Screen.upgrade.select(e);
 //        int a = e.getX() - (Screen.frame.getWidth() - Screen.myWidth - 8);
 //        int b = e.getY() - (Screen.frame.getHeight() - Screen.myHeight - 8);
 

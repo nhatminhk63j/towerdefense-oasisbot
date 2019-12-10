@@ -4,7 +4,9 @@ import Entity.Bullet.Bullet;
 import Entity.Enemy.Enemy;
 import Entity.Enemy.ListEnemy;
 import Entity.Tower.ListTower;
+import Entity.Tower.Remove;
 import Entity.Tower.Shop;
+import Entity.Tower.Upgrade;
 import Handler.MouseHandler;
 import Map.Map;
 import Map.SpawnPoint;
@@ -38,6 +40,9 @@ public class Screen extends JPanel implements Runnable {
     public static List<Bullet> bullets = new ArrayList<>();
     public static Shop shop;
     public static Player player;
+    public static Remove remove;
+    public static Upgrade upgrade;
+
     public int timeFrame = 1000, timeDelay = 1000;
 
     public static boolean isPauseGame = false;
@@ -55,6 +60,8 @@ public class Screen extends JPanel implements Runnable {
         listEnemy = new ListEnemy();
         listTower = new ListTower();
         shop = new Shop();
+        remove = new Remove();
+        upgrade = new Upgrade();
 
         player = new Player();
         spawnPoint = new SpawnPoint();
@@ -86,6 +93,8 @@ public class Screen extends JPanel implements Runnable {
             listTower.draw(g2d);
         }
         shop.draw(g2d);
+        remove.draw(g2d);
+        upgrade.draw(g2d);
     }
 
     public void run(){
