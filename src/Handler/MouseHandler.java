@@ -27,6 +27,8 @@ public class MouseHandler implements MouseMotionListener, MouseListener {
             Screen.pauseGame.sellect(e);
         } else if(Screen.flagMenu == 2){
             Screen.menuGame.exit(e);
+        } else if(Screen.flagMenu == 3){
+            Screen.menuGame.pauseMenuSelect(e);
         }
 //        int a = e.getX() - (Screen.frame.getWidth() - Screen.myWidth - 8);
 //        int b = e.getY() - (Screen.frame.getHeight() - Screen.myHeight - 8);

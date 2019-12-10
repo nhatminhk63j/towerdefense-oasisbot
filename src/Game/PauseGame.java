@@ -14,6 +14,8 @@ public class PauseGame {
         xMouse = e.getX() - (Screen.frame.getWidth() - Screen.myWidth - 8);
         yMouse = e.getY() - (Screen.frame.getHeight() - Screen.myHeight - 8);
         if(xMouse >= xPause && xMouse <= xPause + 64 && yMouse >= yPause && yMouse <= yPause + 64){
+            Screen.isPauseGame = true;
+            Screen.running = false;
             Screen.flagMenu = 3;
         }
     }

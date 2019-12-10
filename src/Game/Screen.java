@@ -46,6 +46,8 @@ public class Screen extends JPanel implements Runnable {
     public int timeFrame = 1000, timeDelay = 1000;
 
     public static boolean isPauseGame = false;
+    public static boolean running = true;
+
     public static int flagMenu = 0;
     public static PauseGame pauseGame;
     public static MenuGame menuGame;
@@ -76,9 +78,6 @@ public class Screen extends JPanel implements Runnable {
     public void paintComponent(Graphics g){
         Graphics2D g2d = (Graphics2D) g.create();
         g.clearRect(0, 0, frame.getWidth(), frame.getHeight());
-        if(flagMenu == 0 || flagMenu == 2) {
-            menuGame.draw(g2d);
-        }
 
         if(isFirst){
             myWidth = getWidth();
@@ -87,7 +86,7 @@ public class Screen extends JPanel implements Runnable {
             define();
         }
         isFirst = false;
-        if(flagMenu == 1){
+        if(flagMenu == 1 || isPauseGame){
 
             map.draw(g);
 
@@ -108,10 +107,13 @@ public class Screen extends JPanel implements Runnable {
             upgrade.draw(g2d);
             pauseGame.draw(g2d);
         }
+        if(flagMenu == 0 || flagMenu == 2 || flagMenu == 3) {
+            menuGame.draw(g2d);
+        }
     }
 
     public void run(){
-        while (true){
+        while (running){
             repaint();
 
 
