@@ -20,7 +20,7 @@ public class Shop {
     int xMouse, yMouse;
     int holdX, holdY;
     boolean mouseDown = false;
-    public Image pause = new ImageIcon("res/pause_button.jpg").getImage();
+
 
     public Shop(){
         init();
@@ -104,7 +104,7 @@ public class Shop {
             else if(Screen.listTower.flag == 3) g2d.drawImage(itemImages[2], holdX - Value.SIZE_TILE/2, holdY - Value.SIZE_TILE/2, Value.SIZE_TILE, Value.SIZE_TILE, null);
         }
 
-        g2d.drawImage(pause, 500, 640, 64, 64, null);
+
 
         g2d.setColor(Color.DARK_GRAY);
         g2d.setFont(new Font("Arial", Font.BOLD, 16));

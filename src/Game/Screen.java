@@ -46,6 +46,9 @@ public class Screen extends JPanel implements Runnable {
     public int timeFrame = 1000, timeDelay = 1000;
 
     public static boolean isPauseGame = false;
+    public static int flagMenu = 0;
+    public static PauseGame pauseGame;
+    public static MenuGame menuGame;
 
     public Screen(Frame frame){
         this.frame = frame;
@@ -53,6 +56,8 @@ public class Screen extends JPanel implements Runnable {
 
         frame.addMouseListener(new MouseHandler());
         frame.addMouseMotionListener(new MouseHandler());
+
+        menuGame = new MenuGame();
     }
 
     public void define(){
@@ -62,6 +67,7 @@ public class Screen extends JPanel implements Runnable {
         shop = new Shop();
         remove = new Remove();
         upgrade = new Upgrade();
+        pauseGame = new PauseGame();
 
         player = new Player();
         spawnPoint = new SpawnPoint();
@@ -70,6 +76,10 @@ public class Screen extends JPanel implements Runnable {
     public void paintComponent(Graphics g){
         Graphics2D g2d = (Graphics2D) g.create();
         g.clearRect(0, 0, frame.getWidth(), frame.getHeight());
+        if(flagMenu == 0 || flagMenu == 2) {
+            menuGame.draw(g2d);
+        }
+
         if(isFirst){
             myWidth = getWidth();
             myHeight = getHeight();
@@ -77,24 +87,27 @@ public class Screen extends JPanel implements Runnable {
             define();
         }
         isFirst = false;
+        if(flagMenu == 1){
 
-        map.draw(g);
+            map.draw(g);
 
-        if(listEnemy.isCreateNewEnemy()){
-            listEnemy.addEnemy(listEnemy.createEnemy());
-        }
+            if(listEnemy.isCreateNewEnemy()){
+                listEnemy.addEnemy(listEnemy.createEnemy());
+            }
 
-        if(!listEnemy.enemyList.isEmpty()){
-            listEnemy.delete();
-            listEnemy.draw(g2d);
+            if(!listEnemy.enemyList.isEmpty()){
+                listEnemy.delete();
+                listEnemy.draw(g2d);
+            }
+            if(!listTower.towerList.isEmpty()){
+                listTower.attackEnemy(listEnemy);
+                listTower.draw(g2d);
+            }
+            shop.draw(g2d);
+            remove.draw(g2d);
+            upgrade.draw(g2d);
+            pauseGame.draw(g2d);
         }
-        if(!listTower.towerList.isEmpty()){
-            listTower.attackEnemy(listEnemy);
-            listTower.draw(g2d);
-        }
-        shop.draw(g2d);
-        remove.draw(g2d);
-        upgrade.draw(g2d);
     }
 
     public void run(){

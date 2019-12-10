@@ -17,9 +17,17 @@ public class MouseHandler implements MouseMotionListener, MouseListener {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        Screen.shop.click(e);
-        Screen.remove.select(e);
-        Screen.upgrade.select(e);
+
+        if(Screen.flagMenu == 0){
+            Screen.menuGame.select(e);
+        } else if(Screen.flagMenu == 1){
+            Screen.shop.click(e);
+            Screen.remove.select(e);
+            Screen.upgrade.select(e);
+            Screen.pauseGame.sellect(e);
+        } else if(Screen.flagMenu == 2){
+            Screen.menuGame.exit(e);
+        }
 //        int a = e.getX() - (Screen.frame.getWidth() - Screen.myWidth - 8);
 //        int b = e.getY() - (Screen.frame.getHeight() - Screen.myHeight - 8);
 

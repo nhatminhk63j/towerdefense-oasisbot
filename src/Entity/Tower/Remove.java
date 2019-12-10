@@ -35,6 +35,7 @@ public class Remove {
         if(xMouse >= xRemove + 64 && xMouse <= xRemove + 64 + 16 && yRemove >= yRemove -16 && yRemove <= yRemove - 16 + 16){
             System.out.println("Selected");
             Screen.listTower.towerList.remove(numberTowerSelect);
+            Screen.upgrade.setVisiable(false);
         }
 
     }
