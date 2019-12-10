@@ -8,6 +8,7 @@ import Entity.Tower.Shop;
 import Handler.MouseHandler;
 import Map.Map;
 import Map.SpawnPoint;
+import Sound.Sound;
 
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicTreeUI;
@@ -65,6 +66,7 @@ public class Screen extends JPanel implements Runnable {
         if(isFirst){
             myWidth = getWidth();
             myHeight = getHeight();
+            Sound.play(Sound.backgroundSound);
             define();
         }
         isFirst = false;
@@ -89,8 +91,7 @@ public class Screen extends JPanel implements Runnable {
     public void run(){
         while (true){
             repaint();
-            if(isPauseGame) thread.suspend();
-            else thread.resume();
+
 
             try{
                 Thread.sleep(3);

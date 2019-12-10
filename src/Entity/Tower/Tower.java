@@ -29,7 +29,7 @@ public abstract class Tower extends Entity {
     private String type;
 
     private Image baseTower = new ImageIcon("res/BaseTower.png").getImage();
-    private List<Bullet> bullets = new ArrayList<>();
+
 
     private long timeAttack;
 
@@ -51,47 +51,10 @@ public abstract class Tower extends Entity {
         return false;
     }
 
-    public void attackEnemy(ArrayList<Enemy> enemies){
-        if(checkCollision(enemies)){
-            long TIME = System.currentTimeMillis();
-            if(TIME - timeAttack < getAttackSpeed()) return;
-            timeAttack = TIME;
-            Bullet bullet = null;
-            if(getType() == "NormalTower"){
-                bullet = new NormalTowerBullet(this, getCenter().x, getCenter().y, Value.SIZE_TILE, Value.SIZE_TILE, getAngle());
-            } else if(getType() == "MachineGunTower"){
-                bullet = new MachineGunTowerBullet(this, getCenter().x, getCenter().y, Value.SIZE_TILE, Value.SIZE_TILE, getAngle());
-            } else if(getType() == "SniperTower"){
-                bullet = new SniperTowerBullet(this, getCenter().x, getCenter().y, Value.SIZE_TILE, Value.SIZE_TILE, getAngle());
-            }
-
-            if(getxDistance() <= 0 && getyDistance() <= 0) setFlag(1);
-            else if(getxDistance() <= 0 && getyDistance() >= 0) setFlag(2);
-            else if(getxDistance() >= 0 && getyDistance() <= 0) setFlag(3);
-            else if(getxDistance() >=0 && getyDistance() >= 0) setFlag(4);
-
-            bullet.setFlag(getFlag());
-            bullets.add(bullet);
-            // may be add Sound Effect in here...
-        }
-        for(int i = 0; i < bullets.size(); i++){
-            if(!getShapeCollider().contains((Rectangle2D) bullets.get(i).getShapeCollider())){
-                bullets.remove(i);
-            }
-            for(Enemy enemy : enemies){
-                if(enemy.beAttacked(bullets.get(i))) bullets.remove(i);
-            }
-        }
-    }
-
     public void draw(Graphics2D g2d) {
         g2d.setColor(Color.RED);
         g2d.drawOval(getxPos() - getRange()/2 + 32, getyPos() - getRange()/2 + 32, getRange(), getRange());
         g2d.drawImage(baseTower, getxPos(), getyPos(), 64, 64, null);
-        for(Bullet bullet : bullets){
-            bullet.move();
-            bullet.draw(g2d);
-        }
 
     }
 
@@ -170,4 +133,6 @@ public abstract class Tower extends Entity {
     public void setType(String type) {
         this.type = type;
     }
+
+    public abstract void attackEnemy(ArrayList<Enemy> enemyList);
 }

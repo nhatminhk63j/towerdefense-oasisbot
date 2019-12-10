@@ -25,7 +25,7 @@ public class Value {
     public static final int NORMAL_BULLET_DAMAGE = 20;
 
     public static final int MACHINE_GUN_TOWER_SPEED = 400 / 120;
-    public static final int MACHINE_GUN_TOWER_DAMAGE = 5;
+    public static final int MACHINE_GUN_TOWER_DAMAGE = 50;
 
     public static final int SNIPER_TOWER_SPEED = 700 / 120;
     public static final int SNIPER_TOWER_DAMAGE = 50;

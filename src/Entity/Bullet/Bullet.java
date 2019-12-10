@@ -47,7 +47,7 @@ public abstract class Bullet extends Entity {
     }
 
     public Shape getShapeCollider(){
-        return new Rectangle2D.Double(getxPos(), getyPos(), getWidth()/4, getHeight()/4);
+        return new Rectangle2D.Double(getxPos(), getyPos(), getWidth(), getHeight());
     }
 
     public double getSpeed() {
